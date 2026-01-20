@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git lfs install:*)",
+      "Bash(powershell:*)",
+      "Bash(forfiles /S /C \"cmd /c if @fsize GEQ 104857600 echo @fsize @path\")",
+      "Bash(git reset:*)",
+      "Bash(git update-ref:*)",
+      "Bash(python batch_commit.py:*)"
+    ]
+  }
+}
