@@ -8,7 +8,24 @@
       "Bash(git update-ref:*)",
       "Bash(python batch_commit.py:*)",
       "Bash(git remote add:*)",
-      "Bash(python batch_push.py:*)"
+      "Bash(python batch_push.py:*)",
+      "mcp__knowledge-graph__read_graph",
+      "mcp__knowledge-graph__create_entities",
+      "mcp__knowledge-graph__create_relations",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__list_directory",
+      "Bash(dir:*)",
+      "Bash(ls -la \"C:\\\\Users\\\\work0\\\\uechi\\\\UEProjects\\\\AthleticTrial\\\\Content\\\\Characters\"\" | grep -v \"^d \")",
+      "mcp__knowledge-graph__search_knowledge",
+      "mcp__knowledge-graph__add_observations",
+      "mcp__knowledge-graph__delete_relations",
+      "Bash(xcopy:*)",
+      "Bash(Copy-Item -Path \"C:\\\\Users\\\\work0\\\\uechi\\\\UEProjects\\\\AnimationTestProject\\\\Content\\\\FreeAnimationLibrary\" -Destination \"C:\\\\Users\\\\work0\\\\uechi\\\\UEProjects\\\\AthleticTrial\\\\Content\\\\FreeAnimationLibrary\" -Recurse -Force)",
+      "mcp__knowledge-graph__add_tags",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\work0\\\\uechi\\\\UEProjects\\\\AthleticTrial\\\\Content\\\\FreeAnimationLibrary\\\\Animations\" -Directory)",
+      "Bash(Select-Object -ExpandProperty Name)",
+      "mcp__filesystem__get_file_info",
+      "Bash(git add:*)"
     ]
   }
 }
