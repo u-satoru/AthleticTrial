@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 
 # 設定
-REPO_PATH = Path(r"d:\UnrealProjects\AthleticTrial")
+REPO_PATH = Path(r"c:\Users\work0\uechi\UEProjects\AthleticTrial")
 REMOTE_NAME = "origin"
 BRANCH_NAME = "main"
 

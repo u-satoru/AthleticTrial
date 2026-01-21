@@ -25,7 +25,11 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\work0\\\\uechi\\\\UEProjects\\\\AthleticTrial\\\\Content\\\\FreeAnimationLibrary\\\\Animations\" -Directory)",
       "Bash(Select-Object -ExpandProperty Name)",
       "mcp__filesystem__get_file_info",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd animation libraries and integration plan v4.3\n\n- Copy FreeAnimationLibrary \\(133 files, 21 categories\\) from AnimationTestProject\n- Copy FreeSampleAnimationSet \\(182 files, 15 categories\\) from AnimationTestProject\n- Add integration plan document \\(統合計画書_統合版.md v4.3\\)\n- Add Knowledge Graph for project entity tracking\n- Add CLAUDE.md with project documentation and MCP server configuration\n- Add .mcp.json for MCP server settings\n\nKey findings:\n- BS_Ledge does not exist \\(needs new creation\\)\n- AM_ClimbUp_At_Top is in FreeAnimationLibrary/Climbing_Animations/WallGrab_unGrab/\n- Phase 2 retargeting can be done in AthleticTrial project\n- Migration from AnimationTestProject verified as feasible\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd animation libraries and integration plan v4.3\n\n- Copy FreeAnimationLibrary \\(133 files, 21 categories\\) from AnimationTestProject\n- Copy FreeSampleAnimationSet \\(182 files, 15 categories\\) from AnimationTestProject\n- Add integration plan document \\(統合計画書_統合版.md v4.3\\)\n- Add Knowledge Graph for project entity tracking\n- Add CLAUDE.md with project documentation\n- Update .gitignore to exclude .mcp.json \\(contains secrets\\)\n\nKey findings:\n- BS_Ledge does not exist \\(needs new creation\\)\n- AM_ClimbUp_At_Top is in FreeAnimationLibrary/Climbing_Animations/WallGrab_unGrab/\n- Phase 2 retargeting can be done in AthleticTrial project\n- Migration from AnimationTestProject verified as feasible\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "mcp__brave-search__brave_web_search"
     ]
   }
 }

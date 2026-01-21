@@ -12,7 +12,7 @@ from pathlib import Path
 # 設定
 MAX_COMMIT_SIZE_MB = 200
 MAX_COMMIT_SIZE_BYTES = MAX_COMMIT_SIZE_MB * 1024 * 1024
-REPO_PATH = Path(r"d:\UnrealProjects\AthleticTrial")
+REPO_PATH = Path(r"c:\Users\work0\uechi\UEProjects\AthleticTrial")
 
 
 def remove_lock_file():
