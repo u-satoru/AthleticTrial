@@ -1,0 +1,106 @@
+{
+    "mcpServers": {
+        "filesystem": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "~/Pictures/Screenshots",
+                "../../UnrealProjects",
+                "../../Repository"
+            ]
+        },
+        "memory": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-memory"
+            ],
+            "env": {
+                "MEMORY_FILE_PATH": "../AthleticTrial/claude-memory/project_context.json"
+            }
+        },
+        "knowledge-graph": {
+            "command": "npx",
+            "args": ["-y", "knowledgegraph-mcp"],
+            "env": {
+                "KNOWLEDGEGRAPH_SQLITE_PATH": "../AnimationTestProject/.knowledge-graph/memory.db"
+            }
+        },
+        "deepwiki": {
+            "type": "http",
+            "url": "https://mcp.deepwiki.com/mcp"
+        },
+        "context7": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@upstash/context7-mcp"
+            ]
+        },
+        "ddg-search": {
+            "command": "uvx",
+            "args": [
+                "duckduckgo-mcp-server"
+            ]
+        },
+        "brave-search": {
+            "command": "cmd",
+            "args": [
+                "/c",
+                "npx",
+                "-y",
+                "@modelcontextprotocol/server-brave-search"
+            ],
+            "env": {
+                "BRAVE_API_KEY": "BSAHHvyaLzvTAzHJo7eGqkM2sT4yWgF"
+            },
+            "serverInstructions": "Brave Searchを使用する際：\n1. 公式ドキュメント（dev.epicgames.com、docs.unrealengine.com）を優先\n2. Tom Looman（tomlooman.com）のサイトを高く評価\n3. 2020年以前の古い情報は避ける\n4. フォーラム投稿はEpic Gamesスタッフの回答を優先\n5. 検索結果は常に情報源のURLを含めて報告"
+        },
+        "git": {
+            "command": "uvx",
+            "args": [
+                "mcp-server-git"
+            ]
+        },
+        "github": {
+            "command": "C:/nvm4w/nodejs/npx.cmd",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-github"
+            ],
+            "env": {
+                "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+            }
+        },
+        "blender": {
+            "command": "cmd",
+            "args": ["/c", "uvx", "blender-mcp"],
+            "env": {
+                "BLENDER_HOST": "127.0.0.1",
+                "BLENDER_PORT": "9876"
+            }
+        },
+        "unrealMCP": {
+            "command": "uv",
+            "args": [
+                "--directory",
+                "C:/Users/work0/uechi/unreal-mcp/Python",
+                "run",
+                "unreal_mcp_server.py"
+            ]
+        },
+       "unreal-handshake": {
+            "command": "python",
+            "args": [
+                "C:/Program Files/Epic Games/UE_5.5/Engine/Plugins/Marketplace/Ultimate406590bf982fV62/Content/Python/mcp_main_server.py",
+                "--server-name",
+                "unreal-handshake"
+            ],
+            "env": {
+                "UNREAL_HOST": "localhost",
+                "UNREAL_PORT": "9877"
+            }
+        }
+    }
+}
