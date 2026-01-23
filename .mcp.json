@@ -5,9 +5,9 @@
             "args": [
                 "-y",
                 "@modelcontextprotocol/server-filesystem",
-                "~/Pictures/Screenshots",
-                "../../UEProjects",
-                "../../Repository"
+                "C:/Users/work0/OneDrive/画像/Screenshots",
+                "C:/Users/work0/uechi/UEProjects",
+                "C:/Users/work0/uechi/Repository"
             ]
         },
         "memory": {
