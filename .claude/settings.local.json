@@ -33,7 +33,10 @@
       "mcp__filesystem__read_text_file",
       "Bash(git commit:*)",
       "Bash(else echo \"NOT FOUND\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "mcp__unreal-handshake__get_asset_summary",
+      "mcp__unreal-handshake__list_assets_in_folder",
+      "mcp__unreal-handshake__get_selected_content_browser_assets"
     ]
   },
   "enableAllProjectMcpServers": true,
