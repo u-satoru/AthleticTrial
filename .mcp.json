@@ -1,5 +1,15 @@
 {
     "mcpServers": {
+        "filesystem": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "~/Pictures/Screenshots",
+                "../../UEProjects",
+                "../../Repository"
+            ]
+        },
         "memory": {
             "command": "npx",
             "args": [
