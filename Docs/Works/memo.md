@@ -1144,3 +1144,16 @@ UE6からUEFNスケルトンが標準になりそうな動きです。
 Animation Blueprint の後継システムとして、UAF（Unreal Animation Framework）が開発中ですが
 UE 5.8 では予定として、GASP(Game Animation Support Package) に UAF で完全に構築されたキャラクターを追加するようです。
 
+┌─────────────────┐     ┌──────────────────────────────┐
+│   Get Owner     │     │ Cast To CBP_SandboxCharacter │
+│                 │     │                              │
+│          ● ─────┼────→│ Object                       │
+└─────────────────┘     │                              │
+                        │         As CBP... ● ─────────┼──→ ┌─────────────────┐
+                        └──────────────────────────────┘    │ Set ClimbInput  │
+                                                            │                 │
+                        ┌─────────────────┐                 │ ClimbInput ← ●  │
+                        │ [移動入力値]     │                 │        (Vector2D)
+                        │  (Vector2D)     │                 │                 │
+                        │          ● ─────┼────────────────→│                 │
+                        └─────────────────┘                 └─────────────────┘
