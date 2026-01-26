@@ -36,7 +36,13 @@
       "Bash(fi)",
       "mcp__unreal-handshake__get_asset_summary",
       "mcp__unreal-handshake__list_assets_in_folder",
-      "mcp__unreal-handshake__get_selected_content_browser_assets"
+      "mcp__unreal-handshake__get_selected_content_browser_assets",
+      "mcp__unreal-handshake__how_to_use",
+      "Bash(findstr:*)",
+      "mcp__unreal-handshake__scan_and_index_project_blueprints",
+      "mcp__unreal-handshake__get_relevant_blueprint_context",
+      "mcp__unrealMCP__find_blueprint_nodes",
+      "mcp__unreal-handshake__get_all_scene_actors"
     ]
   },
   "enableAllProjectMcpServers": true,
