@@ -42,7 +42,10 @@
       "mcp__unreal-handshake__scan_and_index_project_blueprints",
       "mcp__unreal-handshake__get_relevant_blueprint_context",
       "mcp__unrealMCP__find_blueprint_nodes",
-      "mcp__unreal-handshake__get_all_scene_actors"
+      "mcp__unreal-handshake__get_all_scene_actors",
+      "mcp__unreal-handshake__get_data_asset_details",
+      "WebFetch(domain:dev.epicgames.com)",
+      "mcp__unreal-handshake__add_variable_to_blueprint"
     ]
   },
   "enableAllProjectMcpServers": true,
