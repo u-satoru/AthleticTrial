@@ -24,7 +24,7 @@
             "command": "npx",
             "args": ["-y", "knowledgegraph-mcp"],
             "env": {
-                "KNOWLEDGEGRAPH_SQLITE_PATH": "../AnimationTestProject/.knowledge-graph/memory.db"
+                "KNOWLEDGEGRAPH_SQLITE_PATH": "../AthleticTrial/.knowledge-graph/memory.db"
             }
         },
         "deepwiki": {
