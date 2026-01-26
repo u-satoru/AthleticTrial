@@ -45,7 +45,12 @@
       "mcp__unreal-handshake__get_all_scene_actors",
       "mcp__unreal-handshake__get_data_asset_details",
       "WebFetch(domain:dev.epicgames.com)",
-      "mcp__unreal-handshake__add_variable_to_blueprint"
+      "mcp__unreal-handshake__add_variable_to_blueprint",
+      "mcp__unreal-handshake__get_selected_graph_nodes_as_text",
+      "mcp__unreal-handshake__check_request_feasibility",
+      "mcp__unreal-handshake__get_api_context",
+      "mcp__unreal-handshake__generate_blueprint_logic",
+      "mcp__unreal-handshake__insert_blueprint_code_at_selection"
     ]
   },
   "enableAllProjectMcpServers": true,
