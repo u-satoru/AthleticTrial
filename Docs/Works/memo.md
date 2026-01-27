@@ -1157,3 +1157,220 @@ UE 5.8 では予定として、GASP(Game Animation Support Package) に UAF で�
                         │  (Vector2D)     │                 │                 │
                         │          ● ─────┼────────────────→│                 │
                         └─────────────────┘                 └─────────────────┘
+
+# 現在の修正状況
+壁吸着を Fキー 、 壁離脱を Gキー と変更して、IMC_Climbing を修正。
+ですが、壁検出用 Trace Line が発射されず、壁吸着もできない。
+そこで、 IMC_Sandbox に Fキー マッピングを追加すると、Trace Line は発射されるようになったが、
+Trace Line の発射方向がプレイヤーキャラの正面ではなく斜めに発射されている状況
+
+# 問題１の回答
+- MC_Sandbox に追加した F キーは IA_GrabWall にマッピングした。
+
+Fキー を入力するとカメラもキャラクターも動かなくなる。よってTrace Line の発射方向が確認できない。
+更に Fキー を連続入力するとキャラクターが、どんどん地面に潜っていき、最終的には腰の位置まで地面に潜る **Ultra Think**
+
+
+## 確認
+F キーを押したとき、画面に以下のデバッグメッセージ
+
+- "CheckForClimbableSurface Called" (青色): 表示される
+- "HitWall: true/false" (青色): true
+- "Condition Result: true/false" (青色): true
+
+## 原因
+1. 1つ
+2. カメラを動かせないため確認できない
+**Ultra Think**
+
+
+- Impact Normal: X=0.000 Y=1.000 Z=0.000
+- WallOffset: 60.0
+**Ultra Think**
+
+
+## EnableWallClimbingTick
+[N0]EnableWallClimbingTick{O:then>N2.execute} [N1]Self-Reference{O:self>N2.self} [N2]SetComponentTickEnabled{I:execute<N0.then,self<N1.self;O:then>N3.execute;D:bEnabled=true} [N3]SetbIsWallClimbingActive{I:execute<N2.then;O:then>N4.execute;D:bIsWallClimbingActive=true} [N4]SetbIsClimbing{I:execute<N3.then;D:bIsClimbing=true}
+
+## EnableWallClimbingTick 
+[N0]DisableAllClimbingTicks{O:then>N2.execute} [N1]Self-Reference{O:self>N2.self} [N2]SetComponentTickEnabled{I:execute<N0.then,self<N1.self;O:then>N3.execute;D:bEnabled=false} [N3]SetbIsWallClimbingActive{I:execute<N2.then;O:then>N4.execute;D:bIsWallClimbingActive=false} [N4]SetbIsLedgeClimbingActive{I:execute<N3.then;O:then>N5.execute;D:bIsLedgeClimbingActive=false} [N5]SetbIsClimbing{I:execute<N4.then;D:bIsClimbing=false}
+
+これでよいですか？ **Ultra Think**
+
+
+
+- 1回目の F キー: 壁に吸着しません
+- 2回目の F キー: 壁離脱は Gキー
+- 連続で F キーを押しても 地面に潜らない: 地面に潜らなくなりました。カメラ操作もキャラ操作も可能になりました。
+- 1回目の F キー のときのスクリーション と 2回目の F キー のときのスクリーション
+
+**ログの読み方は上から下へ**
+## 1回目の F キー
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: false
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] GrabWall Triggered
+LogBlueprintUserMessages: [ClimbingComponent] P=7.175000 Y=273.549998 R=0.000000
+LogBlueprintUserMessages: [ClimbingComponent] CheckForClimbableSurface Called
+LogBlueprintUserMessages: [ClimbingComponent] X=0.000 Y=1.000 Z=0.000
+LogBlueprintUserMessages: [ClimbingComponent] HitWall: true
+LogBlueprintUserMessages: [ClimbingComponent] Condition Result: true
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] StartClimbing_GASP - Active
+LogBlueprintUserMessages: [ClimbingComponent] EnableWallClimbingTick Called
+LogBlueprintUserMessages: [ClimbingComponent] F Key Pressed
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] StopClimbing_GASP - Deactivated
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: false
+
+## 2回目の F キー
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: false
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] GrabWall Triggered
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] StopClimbing_GASP - Deactivated
+LogBlueprintUserMessages: [ClimbingComponent] F Key Pressed
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] StopClimbing_GASP - Deactivated
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: false
+
+
+**ログの読み方は上から下へ** **Ultra Think**
+## 1回目の F キー
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: false
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] GrabWall Triggered
+LogBlueprintUserMessages: [ClimbingComponent] P=1.750000 Y=262.349999 R=0.000000
+LogBlueprintUserMessages: [ClimbingComponent] CheckForClimbableSurface Called
+LogBlueprintUserMessages: [ClimbingComponent] X=0.000 Y=1.000 Z=0.000
+LogBlueprintUserMessages: [ClimbingComponent] HitWall: true
+LogBlueprintUserMessages: [ClimbingComponent] Condition Result: true
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] StartClimbing_GASP - Active
+LogBlueprintUserMessages: [ClimbingComponent] EnableWallClimbingTick Called
+LogBlueprintUserMessages: [ClimbingComponent] F Key Pressed
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] StopClimbing_GASP - Deactivated
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: false
+
+**ログの読み方は上から下へ** **Ultra Think**
+## AC_Climbing 内に 「F Key Pressed」の PrintString があるのは、ここだけ **Ultra Think**
+[N0]PrintString{D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=FKeyPressed,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.000000,G=0.660000,B=1.000000,A=1.000000)}
+
+
+
+**ログの読み方は上から下へ** **Ultra Think**
+## 1回目の F キー
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: false
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] GrabWall Triggered
+LogBlueprintUserMessages: [ClimbingComponent] P=5.425000 Y=264.099999 R=0.000000
+LogBlueprintUserMessages: [ClimbingComponent] CheckForClimbableSurface Called
+LogBlueprintUserMessages: [ClimbingComponent] X=0.000 Y=1.000 Z=0.000
+LogBlueprintUserMessages: [ClimbingComponent] HitWall: true
+LogBlueprintUserMessages: [ClimbingComponent] Condition Result: true
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] StartClimbing_GASP - Active
+LogBlueprintUserMessages: [ClimbingComponent] EnableWallClimbingTick Called
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=-3.415 Y=-820.000 Z=91.149
+LogBlueprintUserMessages: [ClimbingComponent] No input - skipping Line Trace
+LogBlueprintUserMessages: [ClimbingComponent] UpdateWallAttachment Called
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=-3.415 Y=-820.000 Z=91.149
+LogBlueprintUserMessages: [ClimbingComponent] No input - skipping Line Trace
+LogBlueprintUserMessages: [ClimbingComponent] UpdateWallAttachment Called
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=-3.415 Y=-820.000 Z=91.149
+LogBlueprintUserMessages: [ClimbingComponent] No input - skipping Line Trace
+
+## UpdateWallAttachment 関数の内容  **Ultra Think**
+[N0]UpdateWallAttachment{O:DeltaTime>N10.DeltaTime,DeltaTime>N9.DeltaTime,then>N8.execute} [N1]GetOwnerCharacter{O:OwnerCharacter>N11.self,OwnerCharacter>N12.self,OwnerCharacter>N2.self,OwnerCharacter>N3.self} [N2]GetActorRotation{I:self<N1.OwnerCharacter;O:ReturnValue>N9.Current} [N3]GetActorLocation{I:self<N1.OwnerCharacter;O:ReturnValue>N10.Current} [N4]GetTargetWallRotation{O:TargetWallRotation>N9.Target} [N5]GetRotationInterpSpeed{O:RotationInterpSpeed>N9.InterpSpeed} [N6]GetWallHitLocation{O:WallHitLocation>N10.Target} [N7]GetLocationInterpSpeed{O:LocationInterpSpeed>N10.InterpSpeed} [N8]PrintString{I:execute<N0.then;O:then>N11.execute;D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=UpdateWallAttachmentCalled,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.000000,G=0.660000,B=1.000000,A=1.000000)} [N9]RInterpTo{I:Current<N2.ReturnValue,DeltaTime<N0.DeltaTime,InterpSpeed<N5.RotationInterpSpeed,Target<N4.TargetWallRotation;O:ReturnValue>N11.NewRotation;D:Current=0,0,0,DeltaTime=0.0,InterpSpeed=0.0,self=/Script/Engine.Default__KismetMathLibrary,Target=0,0,0} [N10]VInterpTo{I:Current<N3.ReturnValue,DeltaTime<N0.DeltaTime,InterpSpeed<N7.LocationInterpSpeed,Target<N6.WallHitLocation;O:ReturnValue>N12.NewLocation;D:Current=0,0,0,DeltaTime=0.0,InterpSpeed=0.0,self=/Script/Engine.Default__KismetMathLibrary,Target=0,0,0} [N11]SetActorRotation{I:execute<N8.then,NewRotation<N9.ReturnValue,self<N1.OwnerCharacter;O:then>N12.execute;D:bTeleportPhysics=false,NewRotation=0,0,0} [N12]SetActorLocation{I:execute<N11.then,NewLocation<N10.ReturnValue,self<N1.OwnerCharacter;D:bSweep=false,bTeleport=false,NewLocation=0,0,0}
+
+
+## TryGrabWall 関数の内容  **Ultra Think**
+[N0]IsFalling{I:self<N1.CharacterMovement;O:ReturnValue>N5.A} [N1]GetCharacterMovement{I:self<N2.OwnerCharacter;O:CharacterMovement>N0.self} [N2]GetOwnerCharacter{O:OwnerCharacter>N1.self} [N3]GetbIsClimbing{O:bIsClimbing>N4.A} [N4]NOTBoolean{I:A<N3.bIsClimbing;O:ReturnValue>N8.A;D:A=false,self=/Script/Engine.Default__KismetMathLibrary} [N5]NOTBoolean{I:A<N0.ReturnValue;O:ReturnValue>N8.B;D:A=false,self=/Script/Engine.Default__KismetMathLibrary} [N6]TryGrabWall{O:then>N7.execute} [N7]CheckForClimbableSurface{I:execute<N6.then;O:bHitWall>N10.B,bHitWall>N9.InBool,HitResult>N18.HitResult,then>N14.execute} [N8]ANDBoolean{I:A<N4.ReturnValue,B<N5.ReturnValue;O:ReturnValue>N10.A;D:A=false,B=false,self=/Script/Engine.Default__KismetMathLibrary} [N9]ToString(Boolean){I:InBool<N7.bHitWall;O:ReturnValue>N11.B;D:InBool=false,self=/Script/Engine.Default__KismetStringLibrary} [N10]ANDBoolean{I:A<N8.ReturnValue,B<N7.bHitWall;O:ReturnValue>N12.InBool,ReturnValue>N16.Condition;D:A=false,B=false,self=/Script/Engine.Default__KismetMathLibrary} [N11]Append{I:B<N9.ReturnValue;O:ReturnValue>N14.InString;D:A=HitWall:,self=/Script/Engine.Default__KismetStringLibrary} [N12]ToString(Boolean){I:InBool<N10.ReturnValue;O:ReturnValue>N13.B;D:InBool=false,self=/Script/Engine.Default__KismetStringLibrary} [N13]Append{I:B<N12.ReturnValue;O:ReturnValue>N15.InString;D:A=ConditionResult:,self=/Script/Engine.Default__KismetStringLibrary} [N14]PrintString{I:execute<N7.then,InString<N11.ReturnValue;O:then>N15.execute;D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=Hello,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.000000,G=0.660000,B=1.000000,A=1.000000)} [N15]PrintString{I:execute<N14.then,InString<N13.ReturnValue;O:then>N16.execute;D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=Hello,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.000000,G=0.660000,B=1.000000,A=1.000000)} [N16]Branch{I:Condition<N10.ReturnValue,execute<N15.then;O:else>N17.execute,then>N18.execute;D:Condition=true} [N17]ReturnNode{I:execute<N16.else;D:Success=false} [N18]AttachToWall{I:execute<N16.then,HitResult<N7.HitResult;O:then>N19.execute} [N19]CallOnClimbingStarted{I:execute<N18.then;O:then>N20.execute} [N20]EnableWallClimbingTick{I:execute<N19.then;O:then>N21.execute} [N21]ReturnNode{I:execute<N20.then;D:Success=true}
+
+
+[N0]IsFalling{I:self<N1.CharacterMovement;O:ReturnValue>N6.A} [N1]GetCharacterMovement{I:self<N2.OwnerCharacter;O:CharacterMovement>N0.self} [N2]GetOwnerCharacter{O:OwnerCharacter>N1.self} [N3]GetbIsClimbing{O:bIsClimbing>N4.A} [N4]NOTBoolean{I:A<N3.bIsClimbing;O:ReturnValue>N8.A;D:A=false,self=/Script/Engine.Default__KismetMathLibrary} [N5]TryGrabWall{O:then>N7.execute} [N6]NOTBoolean{I:A<N0.ReturnValue;O:ReturnValue>N8.B;D:A=false,self=/Script/Engine.Default__KismetMathLibrary} [N7]CheckForClimbableSurface{I:execute<N5.then;O:bHitWall>N10.B,bHitWall>N9.InBool,HitResult>N18.HitResult,then>N14.execute} [N8]ANDBoolean{I:A<N4.ReturnValue,B<N6.ReturnValue;O:ReturnValue>N10.A;D:A=false,B=false,self=/Script/Engine.Default__KismetMathLibrary} [N9]ToString(Boolean){I:InBool<N7.bHitWall;O:ReturnValue>N11.B;D:InBool=false,self=/Script/Engine.Default__KismetStringLibrary} [N10]ANDBoolean{I:A<N8.ReturnValue,B<N7.bHitWall;O:ReturnValue>N12.InBool,ReturnValue>N16.Condition;D:A=false,B=false,self=/Script/Engine.Default__KismetMathLibrary} [N11]Append{I:B<N9.ReturnValue;O:ReturnValue>N14.InString;D:A=HitWall:,self=/Script/Engine.Default__KismetStringLibrary} [N12]ToString(Boolean){I:InBool<N10.ReturnValue;O:ReturnValue>N13.B;D:InBool=false,self=/Script/Engine.Default__KismetStringLibrary} [N13]Append{I:B<N12.ReturnValue;O:ReturnValue>N15.InString;D:A=ConditionResult:,self=/Script/Engine.Default__KismetStringLibrary} [N14]PrintString{I:execute<N7.then,InString<N11.ReturnValue;O:then>N15.execute;D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=Hello,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.000000,G=0.660000,B=1.000000,A=1.000000)} [N15]PrintString{I:execute<N14.then,InString<N13.ReturnValue;O:then>N16.execute;D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=Hello,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.000000,G=0.660000,B=1.000000,A=1.000000)} [N16]Branch{I:Condition<N10.ReturnValue,execute<N15.then;O:else>N17.execute,then>N18.execute;D:Condition=true} [N17]ReturnNode{I:execute<N16.else;D:Success=false} [N18]AttachToWall{I:execute<N16.then,HitResult<N7.HitResult;O:then>N21.execute} [N19]GetCharacterMovement{I:self<N20.OwnerCharacter;O:CharacterMovement>N21.self} [N20]GetOwnerCharacter{O:OwnerCharacter>N19.self} [N21]SetMovementMode{I:execute<N18.then,self<N19.CharacterMovement;O:then>N22.execute;D:NewCustomMode=0.0,NewMovementMode=MOVE_Flying} [N22]CallOnClimbingStarted{I:execute<N21.then;O:then>N23.execute} [N23]EnableWallClimbingTick{I:execute<N22.then;O:then>N24.execute} [N24]ReturnNode{I:execute<N23.then;D:Success=true}
+これで正しいですか？ **Ultra Think**
+
+LocationInterpSpeed 変数のデフォルト値: 100.0
+RotationInterpSpeed 変数のデフォルト値: 100.0
+
+
+**ログの読み方は上から下へ** **Ultra Think**
+## 1回目の F キー
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: false
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] GrabWall Triggered
+LogBlueprintUserMessages: [ClimbingComponent] P=5.250000 Y=274.949999 R=0.000000
+LogBlueprintUserMessages: [ClimbingComponent] CheckForClimbableSurface Called
+LogBlueprintUserMessages: [ClimbingComponent] X=0.000 Y=1.000 Z=0.000
+LogBlueprintUserMessages: [ClimbingComponent] HitWall: true
+LogBlueprintUserMessages: [ClimbingComponent] Condition Result: true
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] StartClimbing_GASP - Active
+LogBlueprintUserMessages: [ClimbingComponent] EnableWallClimbingTick Called
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=27.918 Y=-820.000 Z=92.541
+LogBlueprintUserMessages: [ClimbingComponent] No input - skipping Line Trace
+LogBlueprintUserMessages: [ClimbingComponent] Flying
+LogBlueprintUserMessages: [ClimbingComponent] UpdateWallAttachment Called
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=27.918 Y=-820.000 Z=92.541
+LogBlueprintUserMessages: [ClimbingComponent] No input - skipping Line Trace
+LogBlueprintUserMessages: [ClimbingComponent] Flying
+LogBlueprintUserMessages: [ClimbingComponent] UpdateWallAttachment Called
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=27.918 Y=-820.000 Z=92.541
+LogBlueprintUserMessages: [ClimbingComponent] No input - skipping Line Trace
+LogBlueprintUserMessages: [ClimbingComponent] Flying
+LogBlueprintUserMessages: [ClimbingComponent] UpdateWallAttachment Called
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=27.918 Y=-820.000 Z=92.541
+LogBlueprintUserMessages: [ClimbingComponent] No input - skipping Line Trace
+LogBlueprintUserMessages: [ClimbingComponent] Flying
+LogBlueprintUserMessages: [ClimbingComponent] UpdateWallAttachment Called
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=27.918 Y=-820.000 Z=92.541
+LogBlueprintUserMessages: [ClimbingComponent] No input - skipping Line Trace
+LogBlueprintUserMessages: [ClimbingComponent] Flying
+LogBlueprintUserMessages: [ClimbingComponent] UpdateWallAttachment Called
+
+
+**ログの読み方は上から下へ** **Ultra Think**
+## 1回目の F キー
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: false
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] GrabWall Triggered
+LogBlueprintUserMessages: [ClimbingComponent] P=355.275000 Y=260.249999 R=0.000000
+LogBlueprintUserMessages: [ClimbingComponent] CheckForClimbableSurface Called
+LogBlueprintUserMessages: [ClimbingComponent] X=0.000 Y=1.000 Z=0.000
+LogBlueprintUserMessages: [ClimbingComponent] HitWall: true
+LogBlueprintUserMessages: [ClimbingComponent] Condition Result: true
+LogBlueprintUserMessages: [CBP_SandboxCharacter_C_0] StartClimbing_GASP - Active
+LogBlueprintUserMessages: [ClimbingComponent] EnableWallClimbingTick Called
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=-64.119 Y=-820.000 Z=84.671
+LogBlueprintUserMessages: [ClimbingComponent] No input - skipping Line Trace
+LogBlueprintUserMessages: [ClimbingComponent] Flying
+LogBlueprintUserMessages: [ClimbingComponent] UpdateWallAttachment Called
+LogBlueprintUserMessages: [ClimbingComponent] CurrentLoc: X=-56.735 Y=-837.024 Z=88.275
+LogBlueprintUserMessages: [ClimbingComponent] NewLoc: X=-64.064 Y=-820.127 Z=84.698
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=-64.119 Y=-820.000 Z=84.671
+LogBlueprintUserMessages: [ClimbingComponent] No input - skipping Line Trace
+LogBlueprintUserMessages: [ClimbingComponent] Flying
+LogBlueprintUserMessages: [ClimbingComponent] UpdateWallAttachment Called
+LogBlueprintUserMessages: [ClimbingComponent] CurrentLoc: X=-64.064 Y=-820.127 Z=84.698
+LogBlueprintUserMessages: [ClimbingComponent] NewLoc: X=-64.119 Y=-820.000 Z=84.671
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=-64.119 Y=-820.000 Z=84.671
+LogBlueprintUserMessages: [ClimbingComponent] No input - skipping Line Trace
+LogBlueprintUserMessages: [ClimbingComponent] Flying
+LogBlueprintUserMessages: [ClimbingComponent] UpdateWallAttachment Called
+LogBlueprintUserMessages: [ClimbingComponent] CurrentLoc: X=-64.119 Y=-820.000 Z=84.671
+LogBlueprintUserMessages: [ClimbingComponent] NewLoc: X=-64.119 Y=-820.000 Z=84.671
+LogBlueprintUserMessages: [ClimbingComponent] AC_Climbing Tick - bIsWallClimbingActive: true
+LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=-64.119 Y=-820.000 Z=84.671
+
+## AttachToWall 関数の内容
+[N0]AttachToWall{O:HitResult>N1.Hit,HitResult>N6.Hit,then>N2.execute} [N1]BreakHitResult{I:Hit<N0.HitResult;O:ImpactNormal>N2.WallNormal,ImpactNormal>N3.A;D:self=/Script/Engine.Default__GameplayStatics} [N2]SetWallNormal{I:execute<N0.then,WallNormal<N1.ImpactNormal;O:then>N5.execute;D:WallNormal=0,0,0} [N3]vector*vector{I:A<N1.ImpactNormal;O:ReturnValue>N4.X;D:B=-1.0} [N4]MakeRotfromX{I:X<N3.ReturnValue;O:ReturnValue>N5.TargetWallRotation;D:self=/Script/Engine.Default__KismetMathLibrary,X=0,0,0} [N5]SetTargetWallRotation{I:execute<N2.then,TargetWallRotation<N4.ReturnValue;O:then>N10.execute;D:TargetWallRotation=0,0,0} [N6]BreakHitResult{I:Hit<N0.HitResult;O:ImpactPoint>N11.A;D:self=/Script/Engine.Default__GameplayStatics} [N7]GetWallNormal{O:WallNormal>N9.A} [N8]GetWallOffset{O:WallOffset>N9.B} [N9]vector*vector{I:A<N7.WallNormal,B<N8.WallOffset;O:ReturnValue>N11.B} [N10]SetWallHitLocation{I:execute<N5.then,WallHitLocation<N11.ReturnValue;O:then>N12.execute;D:WallHitLocation=0,0,0} [N11]vector+vector{I:A<N6.ImpactPoint,B<N9.ReturnValue;O:ReturnValue>N10.WallHitLocation} [N12]ReturnNode{I:execute<N10.then;D:Success=true}
+
+
+ WallOffset 変数のデフォルト値: 60.0
+
+
+## CheckForClimbableSurface 関数の内容
+ [N0]CheckForClimbableSurface{O:then>N2.execute} [N1]GetOwnerCharacter{O:OwnerCharacter>N6.self,OwnerCharacter>N7.self} [N2]PrintString{I:execute<N0.then,InString<N3.ReturnValue;O:then>N8.execute;D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=Hello,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.000000,G=0.660000,B=1.000000,A=1.000000)} [N3]ToString(Rotator){I:InRot<N5.ReturnValue;O:ReturnValue>N2.InString;D:InRot=0,0,0,self=/Script/Engine.Default__KismetStringLibrary} [N4]GetForwardVector{I:InRot<N5.ReturnValue;O:ReturnValue>N10.A;D:InRot=0,0,0,self=/Script/Engine.Default__KismetMathLibrary} [N5]GetControlRotation{I:self<N6.ReturnValue;O:ReturnValue>N3.InRot,ReturnValue>N4.InRot} [N6]GetController{I:self<N1.OwnerCharacter;O:ReturnValue>N5.self} [N7]GetActorLocation{I:self<N1.OwnerCharacter;O:ReturnValue>N11.A,ReturnValue>N12.Start} [N8]PrintString{I:execute<N2.then;O:then>N12.execute;D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=CheckForClimbableSurfaceCalled,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.000000,G=0.660000,B=1.000000,A=1.000000)} [N9]GetTraceLength{O:TraceLength>N10.B} [N10]vector*vector{I:A<N4.ReturnValue,B<N9.TraceLength;O:ReturnValue>N11.B} [N11]vector+vector{I:A<N7.ReturnValue,B<N10.ReturnValue;O:ReturnValue>N12.End} [N12]LineTraceByChannel{I:End<N11.ReturnValue,execute<N8.then,Start<N7.ReturnValue;O:OutHit>N13.Hit,OutHit>N15.HitResult,OutHit>N25.HitResult,ReturnValue>N14.Condition,then>N14.execute;D:bIgnoreSelf=true,bTraceComplex=false,DrawDebugType=ForDuration,DrawTime=10.0,End=0,0,0,self=/Script/Engine.Default__KismetSystemLibrary,Start=0,0,0,TraceChannel=TraceTypeQuery1,TraceColor=(R=1.000000,G=0.000000,B=0.000000,A=1.000000),TraceHitColor=(R=0.000000,G=1.000000,B=0.000000,A=1.000000)} [N13]BreakHitResult{I:Hit<N12.OutHit;O:ImpactNormal>N16.InVec,ImpactNormal>N19.InVec,ImpactNormal>N23.WallNormal,ImpactPoint>N24.WallHitLocation;D:self=/Script/Engine.Default__GameplayStatics} [N14]Branch{I:Condition<N12.ReturnValue,execute<N12.then;O:else>N15.execute,then>N17.execute;D:Condition=true} [N15]ReturnNode{I:execute<N14.else,HitResult<N12.OutHit;D:bHitWall=false} [N16]BreakVector{I:InVec<N13.ImpactNormal;O:Z>N18.A;D:InVec=0,0,0,self=/Script/Engine.Default__KismetMathLibrary} [N17]Branch{I:Condition<N20.ReturnValue,execute<N14.then;O:else>N21.execute,then>N22.execute;D:Condition=true} [N18]Absolute(Float){I:A<N16.Z;O:ReturnValue>N20.A;D:A=0.0,self=/Script/Engine.Default__KismetMathLibrary} [N19]ToString(Vector){I:InVec<N13.ImpactNormal;O:ReturnValue>N22.InString;D:InVec=0,0,0,self=/Script/Engine.Default__KismetStringLibrary} [N20]float<float{I:A<N18.ReturnValue;O:ReturnValue>N17.Condition;D:B=0.1} [N21]ReturnNode{I:execute<N17.else;D:bHitWall=false} [N22]PrintString{I:execute<N17.then,InString<N19.ReturnValue;O:then>N23.execute;D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=Hello,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.000000,G=0.660000,B=1.000000,A=1.000000)} [N23]SetWallNormal{I:execute<N22.then,WallNormal<N13.ImpactNormal;O:then>N24.execute;D:WallNormal=0,0,0} [N24]SetWallHitLocation{I:execute<N23.then,WallHitLocation<N13.ImpactPoint;O:then>N25.execute;D:WallHitLocation=0,0,0} [N25]ReturnNode{I:execute<N24.then,HitResult<N12.OutHit;D:bHitWall=true}
+
+
+
+
+壁頂上に立つために、キャラの頭から数十センチ上にオフセットした位置から壁に向けて数十センチ先をEnd位置として Trace Line を発射しています。壁吸着時に、その Trace Line が壁を見失ったら頂上に到達したとみなして、Eキー で頂上に登って立つ仕様で実装も存在します。ですが、Eキー は GASP と競合しているので、別の キー にマッピングし直す必要があります。 Gキーでも良いでしょう。 以上を検討して **Ultra Think**
