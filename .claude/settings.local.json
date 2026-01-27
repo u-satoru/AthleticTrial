@@ -50,7 +50,8 @@
       "mcp__unreal-handshake__check_request_feasibility",
       "mcp__unreal-handshake__get_api_context",
       "mcp__unreal-handshake__generate_blueprint_logic",
-      "mcp__unreal-handshake__insert_blueprint_code_at_selection"
+      "mcp__unreal-handshake__insert_blueprint_code_at_selection",
+      "mcp__unrealMCP__get_actors_in_level"
     ]
   },
   "enableAllProjectMcpServers": true,
