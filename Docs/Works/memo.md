@@ -1374,3 +1374,130 @@ LogBlueprintUserMessages: [ClimbingComponent] WallHitLocation: X=-64.119 Y=-820.
 
 
 壁頂上に立つために、キャラの頭から数十センチ上にオフセットした位置から壁に向けて数十センチ先をEnd位置として Trace Line を発射しています。壁吸着時に、その Trace Line が壁を見失ったら頂上に到達したとみなして、Eキー で頂上に登って立つ仕様で実装も存在します。ですが、Eキー は GASP と競合しているので、別の キー にマッピングし直す必要があります。 Gキーでも良いでしょう。 以上を検討して **Ultra Think**
+
+
+
+質問 1 の回答
+- GrabWall Triggered: はい
+- StartClimbing_GASP - Active:	はい 
+- CheckForClimbableSurface Called:	はい
+---
+Fキー 入力後、操作ができないので Gキー を入力して、操作可能にしてから、Camera を移動して 壁検出用の Trace Line を確認するためにスクリーンショットをとりました
+
+
+
+## 質問 1: キャラクターの状態 の回答
+- キャラクターが 壁の方を向いている か:	はい（ **方向は変わっていません** ）
+- キャラクターが 壁に近づいている か:	はい（ **移動はしていません** ）
+- キャラクターが 地面に立っている か:	はい 
+- キャラクターの アニメーション が変わったか: いいえ
+
+## 質問 2: 追加の Print String の回答
+- HitWall: true
+- Condition Result: true
+- EnableWallClimbingTick Called
+- UpdateWallAttachment Called
+
+## 質問 3: Trace Line の確認 の回答
+- 赤い線
+
+## 質問 4: Print String の値 の回答 （ **1回目の Fキー 入力時の値** ）
+AC_Climbing Tick - bIsWallClimbingActive:	true
+CurrentLoc:	(x, y, z) の数値: X=24.963 Y=-849.799 Z=88.275
+NewLoc:	(x, y, z) の数値: X=-35.583 Y=-824.840 Z=102.312
+Movement Mode:	Flying
+
+## 質問 5: 壁との距離 の回答
+- 壁から 200 ユニット以内
+
+## 質問 6: 壁の高さ の回答
+- キャラクターの頭の高さより高い
+
+---
+** 1回目の F キー 入力で壁吸着しなくてはいけないので、今は2回目の F キー 入力調査より、 1回目の F キー で壁吸着しないことを優先して**
+**Ultra Think**
+
+- WallHitLocation: X=-14.519 Y=-820.000 Z=90.947
+- WallOffset のデフォルト値: 60.0
+**Ultra Think**
+
+StartClimbing_GASP 関数の中身 以下
+[N0]StartClimbing_GASP{O:then>N1.execute} [N1]SetbIsClimbing_GASP{I:execute<N0.then;O:then>N4.execute;D:bIsClimbing_GASP=true} [N2]GetCharacterMovement{O:CharacterMovement>N3.InputPin,CharacterMovement>N4.self} [N3]K2Node_Knot{I:InputPin<N2.CharacterMovement;O:OutputPin>N8.InputPin} [N4]SetMovementMode{I:execute<N1.then,self<N2.CharacterMovement;O:then>N6.execute;D:NewCustomMode=0.0,NewMovementMode=MOVE_Flying} [N5]GetCapsuleComponent{O:CapsuleComponent>N6.self} [N6]SetCollisionEnabled{I:execute<N4.then,self<N5.CapsuleComponent;O:then>N9.execute;D:NewType=QueryOnly} [N7]GetPlayerController{O:ReturnValue>N10.PlayerController;D:PlayerIndex=0.0,self=/Script/Engine.Default__GameplayStatics} [N8]K2Node_Knot{I:InputPin<N3.OutputPin;O:OutputPin>N9.self} [N9]StopMovementImmediately{I:execute<N6.then,self<N8.OutputPin;O:then>N11.execute} [N10]GetEnhancedInputLocalPlayerSubsystem{I:PlayerController<N7.ReturnValue;O:ReturnValue>N11.self,ReturnValue>N12.InputPin} [N11]RemoveMappingContext{I:execute<N9.then,self<N10.ReturnValue;O:then>N13.execute;D:MappingContext=/Game/Input/IMC_Sandbox.IMC_Sandbox,Options=(bIgnoreAllPressedKeysUntilRelease=True,bForceImmediately=False,bNotifyUserSettings=False)} [N12]K2Node_Knot{I:InputPin<N10.ReturnValue;O:OutputPin>N13.self} [N13]AddMappingContext{I:execute<N11.then,self<N12.OutputPin;O:then>N14.execute;D:MappingContext=/Game/ThirdPerson/Input/IMC_Climbing.IMC_Climbing,Options=(bIgnoreAllPressedKeysUntilRelease=True,bForceImmediately=False,bNotifyUserSettings=False),Priority=1.0} [N14]SetbBlockGASPTraversal{I:execute<N13.then;O:then>N15.execute;D:bBlockGASPTraversal=true} [N15]PrintString{I:execute<N14.then;D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=StartClimbing_GASP-Active,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.023497,G=1.000000,B=0.083553,A=1.000000)}
+
+
+StartClimbing_GASP-Active: 表示されなかった
+SetActorLocation EXECUTED: 表示されなかった
+
+## 確認 1: CBP_SandboxCharacter の BeginPlay の内容
+[N0]EventBeginPlay{} [N1]EventBeginPlay{O:then>N4.execute} [N2]GetCharacterMovement{O:CharacterMovement>N4.self} [N3]GetPreCMCTick{O:PreCMCTick>N4.PrerequisiteComponent} [N4]AddTickPrerequisiteComponent{I:execute<N1.then,PrerequisiteComponent<N3.PreCMCTick,self<N2.CharacterMovement;O:then>N8.execute} [N5]FORNETWORKING:Bind"OnCharacterMovementUpdated"tocustomeventforsimulatedproxies(othercharactersonclientsscreeninnetworkedgame).Thisisbecausethedefaultmovementeventssuchas"EventOnJumped"and"EventOnLanded"arenotcalledonthesesimulatedcharacters,soweneedtodocustomchecks.{} [N6]GetLocalRole{O:ReturnValue>N7.A} [N7]Equal(Enum){I:A<N6.ReturnValue;O:ReturnValue>N8.Condition;D:B=ROLE_SimulatedProxy} [N8]Branch{I:Condition<N7.ReturnValue,execute<N4.then;O:else>N10.InputPin,then>N11.execute;D:Condition=true} [N9]CreateEvent{O:OutputDelegate>N11.Delegate} [N10]K2Node_Knot{I:InputPin<N8.else;O:OutputPin>N14.execute} [N11]BindEventtoOnCharacterMovementUpdated{I:Delegate<N9.OutputDelegate,execute<N8.then} [N12]ClimbingEventDispatch{} [N13]GetClimbingComponent{O:ClimbingComponent>N14.self,ClimbingComponent>N17.self} [N14]BindEventtoOnClimbingStarted{I:Delegate<N16.OutputDelegate,execute<N10.OutputPin,self<N13.ClimbingComponent;O:then>N17.execute} [N15]OnClimbingStopped_Event_0{O:OutputDelegate>N17.Delegate,then>N18.execute} [N16]OnClimbingStarted_Event{O:OutputDelegate>N14.Delegate,then>N19.execute} [N17]BindEventtoOnClimbingStopped{I:Delegate<N15.OutputDelegate,execute<N14.then,self<N13.ClimbingComponent} [N18]StopClimbing_GASP{I:execute<N15.then} [N19]StartClimbing_GASP{I:execute<N16.then}
+
+## 確認 2: AC_Climbing の TryGrabWall の内容
+[N0]IsFalling{I:self<N1.CharacterMovement;O:ReturnValue>N6.A} [N1]GetCharacterMovement{I:self<N2.OwnerCharacter;O:CharacterMovement>N0.self} [N2]GetOwnerCharacter{O:OwnerCharacter>N1.self} [N3]GetbIsClimbing{O:bIsClimbing>N4.A} [N4]NOTBoolean{I:A<N3.bIsClimbing;O:ReturnValue>N8.A;D:A=false,self=/Script/Engine.Default__KismetMathLibrary} [N5]TryGrabWall{O:then>N7.execute} [N6]NOTBoolean{I:A<N0.ReturnValue;O:ReturnValue>N8.B;D:A=false,self=/Script/Engine.Default__KismetMathLibrary} [N7]CheckForClimbableSurface{I:execute<N5.then;O:bHitWall>N10.B,bHitWall>N9.InBool,HitResult>N18.HitResult,then>N14.execute} [N8]ANDBoolean{I:A<N4.ReturnValue,B<N6.ReturnValue;O:ReturnValue>N10.A;D:A=false,B=false,self=/Script/Engine.Default__KismetMathLibrary} [N9]ToString(Boolean){I:InBool<N7.bHitWall;O:ReturnValue>N11.B;D:InBool=false,self=/Script/Engine.Default__KismetStringLibrary} [N10]ANDBoolean{I:A<N8.ReturnValue,B<N7.bHitWall;O:ReturnValue>N12.InBool,ReturnValue>N16.Condition;D:A=false,B=false,self=/Script/Engine.Default__KismetMathLibrary} [N11]Append{I:B<N9.ReturnValue;O:ReturnValue>N14.InString;D:A=HitWall:,self=/Script/Engine.Default__KismetStringLibrary} [N12]ToString(Boolean){I:InBool<N10.ReturnValue;O:ReturnValue>N13.B;D:InBool=false,self=/Script/Engine.Default__KismetStringLibrary} [N13]Append{I:B<N12.ReturnValue;O:ReturnValue>N15.InString;D:A=ConditionResult:,self=/Script/Engine.Default__KismetStringLibrary} [N14]PrintString{I:execute<N7.then,InString<N11.ReturnValue;O:then>N15.execute;D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=Hello,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.000000,G=0.660000,B=1.000000,A=1.000000)} [N15]PrintString{I:execute<N14.then,InString<N13.ReturnValue;O:then>N16.execute;D:bPrintToLog=true,bPrintToScreen=true,Duration=2.0,InString=Hello,Key=None,self=/Script/Engine.Default__KismetSystemLibrary,TextColor=(R=0.000000,G=0.660000,B=1.000000,A=1.000000)} [N16]Branch{I:Condition<N10.ReturnValue,execute<N15.then;O:else>N17.execute,then>N18.execute;D:Condition=true} [N17]ReturnNode{I:execute<N16.else;D:Success=false} [N18]AttachToWall{I:execute<N16.then,HitResult<N7.HitResult;O:then>N21.execute} [N19]GetCharacterMovement{I:self<N20.OwnerCharacter;O:CharacterMovement>N21.self} [N20]GetOwnerCharacter{O:OwnerCharacter>N19.self} [N21]SetMovementMode{I:execute<N18.then,self<N19.CharacterMovement;O:then>N22.execute;D:NewCustomMode=0.0,NewMovementMode=MOVE_Flying} [N22]CallOnClimbingStarted{I:execute<N21.then;O:then>N23.execute} [N23]EnableWallClimbingTick{I:execute<N22.then;O:then>N24.execute} [N24]ReturnNode{I:execute<N23.then;D:Success=true}
+
+---
+
+## 進捗状況（2026-01-28）- AthleticTrial クライミングシステム
+
+### 完了したタスク
+
+1. **Phase 1: BeginPlay から IMC_Climbing の Add Mapping Context を削除** ✓
+   - Delay → CastToPlayerController → PrintString → AddMappingContext チェーンを削除
+   - イベントバインディング部分は保持
+
+2. **Phase 1/3: CBP_SandboxCharacter に IA_Release イベントハンドラー追加** ✓
+   - IA_Release (Started) → GetClimbingComponent → Get bIsAtClimbTop → Branch
+   - True → StartClimbUpTop / False → ReleaseFromWall
+
+3. **AC_Climbing の ReleaseFromWall に bIsClimbing = false を追加** ✓
+   - 2回目の F キーで Trace Line が発射されない問題を修正
+
+4. **AttachToWall の vector * vector を vector * float に修正** ✓
+   - UE5 の Type Promotion 機能を使用
+   - B ピンを右クリック → Convert Pin → Float
+
+5. **UpdateWallAttachment の修正** ✓
+   - VInterpTo をバイパスして直接 SetActorLocation に接続
+   - Set Actor Location: Sweep = false, Teleport = true
+
+### 現在のブロッカー（未解決）
+
+**壁吸着が動作しない**
+
+- **症状**: F キーを押しても壁に吸着しない
+- **デバッグ出力**:
+  - HitWall: true ✓
+  - ConditionResult: true ✓
+  - WallHitLocation: X=-14.519 Y=-820.000 Z=90.947
+  - WallOffset: 60.0 ✓
+  - **StartClimbing_GASP-Active: 表示されない** ❌
+  - **SetActorLocation EXECUTED: 表示されない** ❌
+
+- **原因分析**:
+  - OnClimbingStarted イベントが発火していない、または
+  - TryGrabWall の実行フローが途中で止まっている
+
+- **調査中**:
+  - TryGrabWall 内の SetMovementMode と Call OnClimbingStarted の間にデバッグ出力を追加して確認中
+
+### GASP 特有の問題
+
+- GASP は Motion Matching を使用し、Character Movement Component と密接に連動
+- Character Movement Component が SetActorLocation を上書きする可能性
+- StartClimbing_GASP では以下の対策を実施済み:
+  - SetMovementMode(Flying)
+  - SetCollisionEnabled(QueryOnly)
+  - StopMovementImmediately
+  - bBlockGASPTraversal = true
+
+### 次のステップ
+
+1. TryGrabWall 内の Call OnClimbingStarted 直前に Print String を追加
+2. 実行フローが AttachToWall → SetMovementMode → Call OnClimbingStarted に到達しているか確認
+3. 到達していない場合、AttachToWall 内部を調査
+
+### 残りのタスク（Phase 1 完了後）
+
+- Phase 2: IA_ClimbUp の入力処理実装
+- Phase 2: SetClimbInput 関数連携
+- Phase 2: 壁移動の動作テスト
+- Phase 3: 頂上登りの動作テスト

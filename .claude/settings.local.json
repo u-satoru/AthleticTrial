@@ -51,7 +51,11 @@
       "mcp__unreal-handshake__get_api_context",
       "mcp__unreal-handshake__generate_blueprint_logic",
       "mcp__unreal-handshake__insert_blueprint_code_at_selection",
-      "mcp__unrealMCP__get_actors_in_level"
+      "mcp__unrealMCP__get_actors_in_level",
+      "Bash(sqlite3:*)",
+      "WebFetch(domain:forums.unrealengine.com)",
+      "WebFetch(domain:www.reddit.com)",
+      "WebFetch(domain:www.youtube.com)"
     ]
   },
   "enableAllProjectMcpServers": true,
