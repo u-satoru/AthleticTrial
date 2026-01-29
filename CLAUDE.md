@@ -126,42 +126,6 @@ MCP（Model Context Protocol）サーバは、Claude Code が外部ツール、A
 | `event` | イベント・マイルストーン | 統合作業開始、フェーズ1完了 |
 | `preference` | 設定・好み | コーディング規約 |
 
-##### 使用例
-```
-# エンティティの検索
-search_knowledge(query="AnimationTestProject", project_id="AnimationTestProject")
-
-# エンティティの作成
-create_entities(
-  entities=[{
-    "name": "AC_Climbing",
-    "entityType": "technology",
-    "observations": ["壁登りシステムを実装するActorComponent", "E_ClimbStateを使用"],
-    "tags": ["blueprint", "climbing", "component"]
-  }],
-  project_id="AnimationTestProject"
-)
-
-# 関係性の作成
-create_relations(
-  relations=[{
-    "from": "AC_Climbing",
-    "to": "BP_ThirdPersonCharacter",
-    "relationType": "attached_to"
-  }],
-  project_id="AnimationTestProject"
-)
-
-# 観測の追加
-add_observations(
-  observations=[{
-    "entityName": "AnimationTestProject",
-    "observations": ["フェーズ1: リターゲット設定完了"]
-  }],
-  project_id="AnimationTestProject"
-)
-```
-
 ##### このプロジェクトでの活用方針
 - **project_id**: `AthleticTrial` を使用
 - **作業進捗**: 各作業の開始・完了を `event` タイプで記録
